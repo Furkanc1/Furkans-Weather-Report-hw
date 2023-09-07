@@ -1,0 +1,10 @@
+#title{
+    border-style: outset;
+    border-color: black;
+    text-align: end;
+    padding: 10px;
+    
+}
+.btn{
+    height:max-content
+}
