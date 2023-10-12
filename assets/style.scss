@@ -1,0 +1,75 @@
+:root {
+    --clientMain: red;
+    --cardSize: 20px;
+    --background: rgb(179, 26, 187);
+    --borderRadius: 8px;
+    --containerWidth: 90%;
+}
+.titleContainer{
+    display: flex;
+    border-radius: var(--borderRadius);
+    margin: 25px;
+    padding: 7px;
+    font-family: Epilogue, 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    background-image: radial-gradient(circle at 47% 14%, rgba(205, 205, 205,0.04) 0%, rgba(205, 205, 205,0.04) 43%,transparent 43%, transparent 100%),radial-gradient(circle at 35% 12%, rgba(215, 215, 215,0.04) 0%, rgba(215, 215, 215,0.04) 4%,transparent 4%, transparent 100%),radial-gradient(circle at 1% 35%, rgba(24, 24, 24,0.04) 0%, rgba(24, 24, 24,0.04) 37%,transparent 37%, transparent 100%),radial-gradient(circle at 21% 1%, rgba(0, 0, 0,0.04) 0%, rgba(0, 0, 0,0.04) 26%,transparent 26%, transparent 100%),radial-gradient(circle at 23% 82%, rgba(249, 249, 249,0.04) 0%, rgba(249, 249, 249,0.04) 60%,transparent 60%, transparent 100%),radial-gradient(circle at 11% 54%, rgba(251, 251, 251,0.04) 0%, rgba(251, 251, 251,0.04) 23%,transparent 23%, transparent 100%),radial-gradient(circle at 69% 68%, rgba(234, 234, 234,0.04) 0%, rgba(234, 234, 234,0.04) 10%,transparent 10%, transparent 100%),linear-gradient(90deg, rgb(228, 46, 222),rgb(63, 61, 215));
+}
+
+// weather CSS
+.weatherDataContainer{
+    border-style: solid;
+    border-radius: var(--borderRadius);
+    text-align: center;
+    padding: 10px;
+    .weatherDash {
+        display: flex;
+        align-items: center;
+        justify-content: space-evenly;
+        
+    }
+}
+.weatherData{
+    border-style: dashed;
+    padding: var(--borderRadius);
+}
+#dashBoardTitle{
+    padding-bottom: 10px;
+}
+.itemToComplete{
+    display: flex;
+    justify-content: space-between;
+}
+.search-container {
+    display: flex;
+    align-items: center;
+  }
+  #cityInput {
+    margin-right: 10px;
+  }
+.weatherApp{
+    background: var(--background);
+    margin: 25px;
+    font-family: Epilogue, 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+
+// utility classes
+.flex{
+    display: flex;
+    &.spaceBetween {
+        justify-content: space-between;
+    }
+    &.alignCenter{
+        align-items: center;
+    }
+    &.justifyCenter{
+        justify-content: center;
+    }
+    border-style: solid;
+    border-radius: var(--borderRadius);
+    margin: 25px;
+}
+
+.w100 {
+    width: auto;
+}
+

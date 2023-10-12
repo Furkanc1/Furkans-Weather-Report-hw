@@ -1,26 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./assets/style.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <title>Document</title>
-</head>
-<body>
-    <div class="container">
-        <h1 id="title"> WEATHER RETRIEVAL DASH-BOARD </h1>
-        <div class="input-group">
-            <div class="form-outline">
-              <input type="search" id="form1" class="form-control" />
-              <label class="form-label" for="form1">Search HERE ^</label>
-            </div>
-            <input class="btn btn-primary" type="submit" value="Submit">
-              <i class="fas fa-search"></i>
-            </button>
-          </div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./assets/style.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Barriecito&family=Epilogue:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Monoton&display=swap"
+      rel="stylesheet"
+    />
+    <title>Weather App</title>
+     <!-- Include Day JS -->
+     <script src="https://cdn.jsdelivr.net/npm/dayjs@1.10.4/dayjs.min.js"></script>
+     <!-- <script src="https://cdn.jsdelivr.net/npm/dayjs@1.10.4/plugin/utc.js"></script> -->
+     <script src="https://cdn.jsdelivr.net/npm/dayjs@1.10.4/plugin/timezone.js"></script>
+
+    <script src="./assets/script.js" defer type="module"></script>
+  </head>
+  <body class="weatherApp dark">
+    <div class="titleContainer w100 spaceBetween">
+      <h1 id="title">Furkans' Weather App</h1>
     </div>
-
-
-</body>
+    <div class="weatherDataContainer">
+      <h1 id="dashBoardTitle">WeatherDashboard</h1>
+      <div class="weatherDash">
+        <div class="searchBox">
+          <form class="search-container searchForm">
+            <input
+              type="text"
+              id="locationField"
+              class="locationField"
+              placeholder="Enter Location ..."
+              name="location"
+              required
+            />
+            <button type="submit" class="btn btn-dark">Submit</button>
+          </form>
+        </div>
+        <div class="weatherData">
+          <div class="location">
+            <span class="locationValue">PlaceHolder,XX </span>
+          </div>
+          <div class="date">
+            Date: <span class="dateValue">xx/xx/xxxx </span>
+          </div>
+          <div class="locationWeatherDetails">
+            <div class="temp">Temp: <span class="tempValue">0</span> F</div>
+            <div class="wind">Wind: <span class="windValue">0</span> M/H</div>
+            <div class="humidity">
+              Humidity: <span class="humidityValue">0</span> %
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
 </html>
