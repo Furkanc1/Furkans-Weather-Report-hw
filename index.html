@@ -13,11 +13,11 @@
       rel="stylesheet"
     />
     <title>Weather App</title>
-     <!-- Include Day JS -->
-     <script src="https://cdn.jsdelivr.net/npm/dayjs@1.10.4/dayjs.min.js"></script>
-     <script src="https://cdn.jsdelivr.net/npm/dayjs@1.10.4/plugin/utc.js"></script>
-     <script src="https://cdn.jsdelivr.net/npm/dayjs@1.10.4/plugin/timezone.js"></script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" defer></script>
+    <!-- Include Day JS -->
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1.10.4/dayjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1.10.4/plugin/utc.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1.10.4/plugin/timezone.js"></script>
     <script src="./assets/script.js" defer type="module"></script>
   </head>
   <body class="weatherApp dark">
@@ -43,6 +43,7 @@
         <div class="weatherData">
           <div class="location">
             <span class="locationValue">PlaceHolder,XX </span>
+            <div class="conditionIcon"></div>
           </div>
           <div class="date">
             Date: <span class="dateValue">xx/xx/xxxx </span>
@@ -59,6 +60,7 @@
           </div>
         </div>
       </div>
+      <div class="fivedayForcast"></div>
     </div>
   </body>
 </html>

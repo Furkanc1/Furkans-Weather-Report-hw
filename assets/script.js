@@ -13,33 +13,75 @@ let defaultTimeZone = browserTimezone || timeZones.americaNewYork;
 
 let dateFormat = `MM/DD/YYYY`;
 let timeFormat = `h:mm:ss a`;
+let fullDateFormat = `${timeFormat} ${dateFormat}`;
 
-console.log(`date time in ${defaultTimeZone}`, dayjs().tz(defaultTimeZone).format(`${timeFormat} ${dateFormat}`));
+console.log(`date time in ${defaultTimeZone}`, dayjs().tz(defaultTimeZone).format(fullDateFormat));
 
-const openWeatherApiKey = 'e77365f4013c7543eca0a224e6a01e78';
+const currentWeatherAPIKey = 'e77365f4013c7543eca0a224e6a01e78';
+const oneCallWeatherAPIKey = 'ce5300e7acaa327ad655b8a21d5130d8';
 const locationText = document.querySelector(`.locationValue`);
+const conditionIcon = document.querySelector(`.conditionIcon`);
 const dateText = document.querySelector(`.dateValue`);
 const timeText = document.querySelector(`.timeValue`);
 const temp = document.querySelector(`.tempValue`);
 const wind = document.querySelector(`.windValue`);
 const humidity = document.querySelector(`.humidityValue`);
 const searchForm = document.querySelector(`.searchForm`);
+const fivedayForcast = document.querySelector(`.fivedayForcast`);
 const locationField = document.querySelector(`.locationField`);
+const openWeatherAPIURL = `https://api.openweathermap.org/data/2.5`;
 
 const convertFromKelvinToFahrenheit = (tempInKelvin) => ((tempInKelvin - 273.15) * (9/5) + 32).toFixed(2);
 const convertFromMSToMPH = (speedInMS) => (speedInMS * 2.237).toFixed(2);
 
 const refreshWeatherData = (weatherData) => {
+    conditionIcon.innerHTML = `<img src="http://openweathermap.org/img/wn/${weatherData?.weather[0]?.icon}@2x.png" alt="Weather Condition" />`;
     locationText.innerHTML = `${weatherData?.name}, ${weatherData?.sys.country}`;
-    // fill in date (XX/XX/XXXX)
-    dateText.innerHTML = dayjs().format(dateFormat);
-    // fills in time format
-    timeText.innerHTML = dayjs().format(timeFormat);
     // fills in temp (F)
     temp.innerHTML = convertFromKelvinToFahrenheit(weatherData.main.temp);
     // fills in weather (MPH)
     wind.innerHTML = convertFromMSToMPH(weatherData.wind.speed);
     humidity.innerHTML = weatherData.main.humidity;
+}
+
+const set5DayForcastData = (forecastData) => {
+    // fill in date (XX/XX/XXXX)
+    dateText.innerHTML = dayjs().tz(forecastData.timezone).format(dateFormat);
+    // fills in time format
+    timeText.innerHTML = dayjs().tz(forecastData.timezone).format(timeFormat);
+
+    // See what date times are
+    let { daily } = forecastData;
+    daily = daily.map((day, dayIndex) => ({ ...day, dt: dayjs().add(dayIndex, `days`).tz(forecastData.timezone).format(fullDateFormat) }));
+    let fiveDay = daily.slice(1, 6);
+    console.log(`Five Day`, fiveDay);
+
+    fiveDay.forEach((day, dayIndex) => {
+        // Create the 5 Day forecast
+        let dayForecastElement = document.createElement(`div`);
+        dayForecastElement.classList.add(`dayCast`);
+        dayForecastElement.innerHTML = day.dt;
+        fivedayForcast.append(dayForecastElement);
+    });
+
+}
+
+const fetchWeatherData5DayForecast = async (coordinates) => {
+    let { latitude, longitude } = coordinates;
+    try {
+        let weatherDataForecastResponse = await fetch(`${openWeatherAPIURL}/onecall?lat=${latitude}&lon=${longitude}&appid=${oneCallWeatherAPIKey}`);
+        if (weatherDataForecastResponse.ok == true) {
+            let forecastData = await weatherDataForecastResponse.json(); 
+            if (forecastData != undefined) {
+                console.log(`Raw 5 Day forecast data from Open Weather One Call API`, forecastData);
+                set5DayForcastData(forecastData);
+            }
+        } else {
+            console.log(`error fetching five day data`, weatherDataForecastResponse);
+        }
+    } catch (error) {
+        console.log(`error fetching five day data`, error);
+    }
 }
 
 // to improve this fetch call, later on i will implement javascript
@@ -48,15 +90,17 @@ const refreshWeatherData = (weatherData) => {
 // try catch = javascript sends a bot to see if a function will fail, if a function will fail the bot tells javascript, "dont even run that function at all."
 const fetchWeatherData = async (city) => {
     try {
-        let weatherDataResponse = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${openWeatherApiKey}`);
+        let weatherDataResponse = await fetch(`${openWeatherAPIURL}/weather?q=${city}&appid=${currentWeatherAPIKey}`);
         if (weatherDataResponse.ok == true) {
             let weatherData = await weatherDataResponse.json(); 
             if (weatherData != undefined) {
                 console.log(`Raw data from Open Weather`, weatherData);
+                let coordinates = { latitude: weatherData.coord.lat, longitude: weatherData.coord.lon };
+                fetchWeatherData5DayForecast(coordinates);
                 refreshWeatherData(weatherData);
             }
         } else {
-            console.log(`error fetching data`);
+            console.log(`error fetching data`, weatherDataResponse);
         }
     } catch (error) {
         console.log(error);
