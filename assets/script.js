@@ -14,13 +14,17 @@ let defaultTimeZone = browserTimezone || timeZones.americaNewYork;
 let dateFormat = `MM/DD/YYYY`;
 let timeFormat = `h:mm:ss a`;
 let dayFormat = `dddd`;
+let locationsDatabaseName = `locations`;
 let fullDayFormat = `${dayFormat} ${dateFormat}`;
 let fullDateFormat = `${timeFormat} ${dateFormat}`;
 
-console.log(`date time in ${defaultTimeZone}`, dayjs().tz(defaultTimeZone).format(fullDateFormat));
+let locations = JSON.parse(localStorage.getItem(locationsDatabaseName)) || [];
+
+// console.log(`date time in ${defaultTimeZone}`, dayjs().tz(defaultTimeZone).format(fullDateFormat));
 
 const currentWeatherAPIKey = 'e77365f4013c7543eca0a224e6a01e78';
 const oneCallWeatherAPIKey = 'ce5300e7acaa327ad655b8a21d5130d8';
+const clearLocations = document.querySelector(`.clearLocations`);
 const locationText = document.querySelector(`.locationValue`);
 const conditionIcon = document.querySelector(`.conditionIcon`);
 const dateText = document.querySelector(`.dateValue`);
@@ -29,9 +33,10 @@ const temp = document.querySelector(`.tempValue`);
 const wind = document.querySelector(`.windValue`);
 const humidity = document.querySelector(`.humidityValue`);
 const searchForm = document.querySelector(`.searchForm`);
-const fivedayForcast = document.querySelector(`.fivedayForcast`);
+const fivedayForcastElement = document.querySelector(`.fivedayForcast`);
 const locationField = document.querySelector(`.locationField`);
 const openWeatherAPIURL = `https://api.openweathermap.org/data/2.5`;
+const locationButtonsElem = document.querySelector(`.locationButtons`);
 
 const convertFromMSToMPH = (speedInMS, useDecimals = true) => {
     if (useDecimals == true) {
@@ -40,6 +45,7 @@ const convertFromMSToMPH = (speedInMS, useDecimals = true) => {
         return Math.floor(speedInMS * 2.237);
     }
 };
+
 const convertFromKelvinToFahrenheit = (tempInKelvin, useDecimals = true) => {
     if (useDecimals == true) {
         return ((tempInKelvin - 273.15) * (9/5) + 32).toFixed(2);
@@ -58,17 +64,44 @@ const refreshWeatherData = (weatherData) => {
     humidity.innerHTML = weatherData.main.humidity;
 }
 
-const set5DayForcastData = (forecastData) => {
+const storeLocationFromData = (weatherDataWithForecast) => {
+    // Destructure object and rip the data we need
+    let { lat, lon, name, timezone } = weatherDataWithForecast;
+
+    // Create the final object we want to store
+    let locationToStore = { 
+        name, 
+        timezone,
+        coordinates: {
+            latitude: lat,
+            longitude: lon
+        }
+    }
+
+    let locationNames = locations.map(loc => loc.name);
+
+    // Check if location already exists
+    if (locationNames.includes(locationToStore.name)) {
+        return;
+    } else {
+        locations.push(locationToStore);
+    }
+
+    localStorage.setItem(locationsDatabaseName, JSON.stringify(locations));
+
+    refreshLocations();
+}
+
+const set5DayForcastData = (weatherDataWithForecast) => {
     // fill in date (XX/XX/XXXX)
-    dateText.innerHTML = dayjs().tz(forecastData.timezone).format(dateFormat);
+    dateText.innerHTML = dayjs().tz(weatherDataWithForecast.timezone).format(dateFormat);
     // fills in time format
-    timeText.innerHTML = dayjs().tz(forecastData.timezone).format(timeFormat);
+    timeText.innerHTML = dayjs().tz(weatherDataWithForecast.timezone).format(timeFormat);
 
     // See what date times are
-    let { daily } = forecastData;
-    console.log(`Daily before changes`, daily);
+    let { daily } = weatherDataWithForecast;
     let fiveDay = daily.map((day, dayIndex) => { 
-        let thisDay =  dayjs().add(dayIndex, `days`).tz(forecastData.timezone);
+        let thisDay =  dayjs().add(dayIndex, `days`).tz(weatherDataWithForecast.timezone);
         return {
             ...day, 
             daysFullFormat: thisDay.format(fullDayFormat),
@@ -78,7 +111,8 @@ const set5DayForcastData = (forecastData) => {
             dayDay: thisDay.format(dayFormat),
         }
      }).slice(1, 6);
-    console.log(`daily after we map and modify it`, fiveDay);
+
+     fivedayForcastElement.innerHTML = ``;
 
     // Create the 5 Day forecast
     fiveDay.forEach((day, dayIndex) => {
@@ -130,19 +164,32 @@ const set5DayForcastData = (forecastData) => {
         dayForecastElement.append(daysLocationElement);
         dayForecastElement.append(daysWeatherDetailsElement);
         
-        fivedayForcast.append(dayForecastElement);
+        fivedayForcastElement.append(dayForecastElement);
     });
 
+    weatherDataWithForecast = {
+        ...weatherDataWithForecast,
+        fiveDay,
+        testObject: {
+            id: 1,
+            reason: `test`,
+        }
+    }
+
+    storeLocationFromData(weatherDataWithForecast);
 }
 
-const fetchWeatherData5DayForecast = async (coordinates) => {
+const fetchWeatherData5DayForecast = async (coordinates, name) => {
     let { latitude, longitude } = coordinates;
     try {
         let weatherDataForecastResponse = await fetch(`${openWeatherAPIURL}/onecall?lat=${latitude}&lon=${longitude}&appid=${oneCallWeatherAPIKey}`);
         if (weatherDataForecastResponse.ok == true) {
             let forecastData = await weatherDataForecastResponse.json(); 
             if (forecastData != undefined) {
-                console.log(`Raw 5 Day forecast data from Open Weather One Call API`, forecastData);
+                forecastData = {
+                    ...forecastData,
+                    name
+                }
                 set5DayForcastData(forecastData);
             }
         } else {
@@ -163,9 +210,9 @@ const fetchWeatherData = async (city) => {
         if (weatherDataResponse.ok == true) {
             let weatherData = await weatherDataResponse.json(); 
             if (weatherData != undefined) {
-                console.log(`Raw data from Open Weather`, weatherData);
                 let coordinates = { latitude: weatherData.coord.lat, longitude: weatherData.coord.lon };
-                fetchWeatherData5DayForecast(coordinates);
+                let weatherName = weatherData.name;
+                fetchWeatherData5DayForecast(coordinates, weatherName);
                 refreshWeatherData(weatherData);
             }
         } else {
@@ -176,14 +223,54 @@ const fetchWeatherData = async (city) => {
     }
 }
 
+clearLocations.addEventListener(`click`, event => {
+    localStorage.clear();
+    window.location.reload();
+})
+
 // forms by default want to refresh page --> we want to prevent default behavior `formSubmitEvent.preventDefault();`
 searchForm.addEventListener(`submit`, formSubmitEvent => {
     formSubmitEvent.preventDefault();
     if (locationField.value != ``) {
         if (locationField.value.length > 3) {
             fetchWeatherData(locationField.value);
+            searchForm.reset();
         } else {
             console.log(`Please type valid city`);
         }
     }    
 });
+
+const refreshLocations = () => {
+    if (locations.length > 0) {
+        clearLocations.style.display = `block`;
+        locationButtonsElem.innerHTML = ``;
+        locations.forEach((location, locationIndex) => {
+            let locationButton = document.createElement(`button`);
+            locationButton.className = `locationButton btn btn-dark`;
+            locationButton.innerHTML = location.name;
+            locationButtonsElem.append(locationButton);
+        });
+    
+        let locationButtons = document.querySelectorAll(`.locationButton`);
+        
+        locationButtons.forEach(locButton => {
+            locButton.addEventListener(`click`, event => {
+                let locationWeClickedOn = event.target.innerHTML;
+                fetchWeatherData(locationWeClickedOn);
+            })
+        })
+    } else {
+        clearLocations.style.display = `none`;
+    }
+}
+
+const initialize = () => {
+    // Create Location Buttons
+    // For Each and Map can be switched 
+    // Because they are Array Methods
+    // But forEach will not reuturn a new array
+    refreshLocations();
+}
+
+initialize();

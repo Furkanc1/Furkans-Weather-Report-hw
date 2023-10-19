@@ -19,10 +19,17 @@
     <script src="https://cdn.jsdelivr.net/npm/dayjs@1.10.4/plugin/utc.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/dayjs@1.10.4/plugin/timezone.js"></script>
     <script src="./assets/script.js" defer type="module"></script>
+    <link rel="icon" href="http://openweathermap.org/img/wn/02d@2x.png" type="image/x-icon">
   </head>
   <body class="weatherApp dark">
     <div class="titleContainer w100 spaceBetween">
       <h1 id="title">Furkans' Weather App</h1>
+    </div>
+   <div class="weatherAndLocations">
+    <div class="allLocationButtons">
+      <div class="locationButtons"></div>
+      <button class="currentLocationButton btn btn-primary">Get Current Location</button>
+      <button class="clearLocations btn btn-primary">Clear Locations</button>
     </div>
     <div class="weatherDataContainer">
       <h1 id="dashBoardTitle">WeatherDashboard</h1>
@@ -62,5 +69,6 @@
       </div>
       <div class="fivedayForcast"></div>
     </div>
+   </div>
   </body>
 </html>

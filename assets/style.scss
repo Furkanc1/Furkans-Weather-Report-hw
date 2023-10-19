@@ -15,7 +15,37 @@
 }
 
 // weather CSS
-.weatherDataContainer{
+.weatherAndLocations {
+    display: flex;
+    flex-direction: column;
+    grid-gap: 10px;
+    align-items: center;
+    justify-content: center;
+}
+
+.allLocationButtons {
+    display: flex;
+    flex-direction: column;
+    grid-gap: 10px;
+    width: 100%;
+}
+
+.clearLocations {
+    font-size: 14px;
+}
+
+.locationButtons {
+    display: flex;
+    justify-content: flex-start;
+    width: 100%;
+    margin: 0 auto;
+    align-items: center;
+    grid-gap: 10px;
+    flex-wrap: wrap;
+}
+
+.weatherDataContainer {
+    width: 100%;
     border-style: solid;
     border-radius: var(--borderRadius);
     text-align: center;
@@ -101,4 +131,26 @@
 
 .w100 {
     width: auto;
+}
+
+// Mobile Responsiveness
+
+// Desktop View
+@media (min-width: 1000px) {
+    .weatherAndLocations {
+        flex-direction: row;
+        align-items: flex-start;
+    }
+    .allLocationButtons {
+        max-width: 190px;
+    }
+    .locationButtons {
+        flex-wrap: nowrap;
+        flex-direction: column;
+        max-height: 497px;
+        overflow: auto;
+        button {
+            width: 100%;
+        } 
+    }
 }
