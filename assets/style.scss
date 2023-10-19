@@ -30,7 +30,29 @@
 .weatherData{
     border-style: dashed;
     padding: var(--borderRadius);
+    font-weight: 600;
+    border-radius: 5px;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
+
+.fivedayForcast {
+    align-items: center;
+    display: flex;
+    padding-top: 10px;
+    font-size: 12px;
+    justify-content: space-between;
+    grid-gap: 10px;
+    .conditionIcon {
+        img {
+            max-width: 60px;
+        }
+    }
+}
+
 #dashBoardTitle{
     padding-bottom: 10px;
 }
@@ -41,6 +63,14 @@
 .search-container {
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    grid-gap: 5px;
+    input {
+        height: 100%;
+        padding: 10px;
+        border-radius: var(--borderRadius);
+        border: 0;
+     }
   }
   #cityInput {
     margin-right: 10px;
@@ -71,9 +101,4 @@
 
 .w100 {
     width: auto;
-}
-
-.fivedayForcast {
-    display: flex;
-    padding-top: 10px;
 }

@@ -13,6 +13,8 @@ let defaultTimeZone = browserTimezone || timeZones.americaNewYork;
 
 let dateFormat = `MM/DD/YYYY`;
 let timeFormat = `h:mm:ss a`;
+let dayFormat = `dddd`;
+let fullDayFormat = `${dayFormat} ${dateFormat}`;
 let fullDateFormat = `${timeFormat} ${dateFormat}`;
 
 console.log(`date time in ${defaultTimeZone}`, dayjs().tz(defaultTimeZone).format(fullDateFormat));
@@ -31,8 +33,20 @@ const fivedayForcast = document.querySelector(`.fivedayForcast`);
 const locationField = document.querySelector(`.locationField`);
 const openWeatherAPIURL = `https://api.openweathermap.org/data/2.5`;
 
-const convertFromKelvinToFahrenheit = (tempInKelvin) => ((tempInKelvin - 273.15) * (9/5) + 32).toFixed(2);
-const convertFromMSToMPH = (speedInMS) => (speedInMS * 2.237).toFixed(2);
+const convertFromMSToMPH = (speedInMS, useDecimals = true) => {
+    if (useDecimals == true) {
+        return (speedInMS * 2.237).toFixed(2);
+    } else {
+        return Math.floor(speedInMS * 2.237);
+    }
+};
+const convertFromKelvinToFahrenheit = (tempInKelvin, useDecimals = true) => {
+    if (useDecimals == true) {
+        return ((tempInKelvin - 273.15) * (9/5) + 32).toFixed(2);
+    } else {
+        return Math.floor((tempInKelvin - 273.15) * (9/5) + 32);
+    }
+};
 
 const refreshWeatherData = (weatherData) => {
     conditionIcon.innerHTML = `<img src="http://openweathermap.org/img/wn/${weatherData?.weather[0]?.icon}@2x.png" alt="Weather Condition" />`;
@@ -52,15 +66,70 @@ const set5DayForcastData = (forecastData) => {
 
     // See what date times are
     let { daily } = forecastData;
-    daily = daily.map((day, dayIndex) => ({ ...day, dt: dayjs().add(dayIndex, `days`).tz(forecastData.timezone).format(fullDateFormat) }));
-    let fiveDay = daily.slice(1, 6);
-    console.log(`Five Day`, fiveDay);
+    console.log(`Daily before changes`, daily);
+    let fiveDay = daily.map((day, dayIndex) => { 
+        let thisDay =  dayjs().add(dayIndex, `days`).tz(forecastData.timezone);
+        return {
+            ...day, 
+            daysFullFormat: thisDay.format(fullDayFormat),
+            dt: thisDay.format(fullDateFormat),
+            daysDate: thisDay.format(dateFormat),
+            daysTime: thisDay.format(timeFormat),
+            dayDay: thisDay.format(dayFormat),
+        }
+     }).slice(1, 6);
+    console.log(`daily after we map and modify it`, fiveDay);
 
+    // Create the 5 Day forecast
     fiveDay.forEach((day, dayIndex) => {
-        // Create the 5 Day forecast
         let dayForecastElement = document.createElement(`div`);
-        dayForecastElement.classList.add(`dayCast`);
-        dayForecastElement.innerHTML = day.dt;
+        dayForecastElement.className = `dayCast weatherData`;
+
+        // let daysDateTime = day.dt;
+        // let daysDay = day.daysDay;
+        // let daysDate = day.daysDate;
+        let daysHumidity = day.humidity;
+        let daysFullFormat = day.daysFullFormat;
+        let daysWeatherIcon = day.weather[0].icon;
+        let daysWindSpeed = convertFromMSToMPH(day.wind_speed, false);
+        let daysTemperatureInF = convertFromKelvinToFahrenheit(day.temp.max);
+
+        let daysLocationElement = document.createElement(`div`);
+        daysLocationElement.className = `location`;
+        let daysWeatherDetailsElement = document.createElement(`div`);
+        daysWeatherDetailsElement.className = `locationWeatherDetails`;
+
+        let daysLocationValue = document.createElement(`span`);
+        daysLocationValue.className = `locationValue`;
+        let daysConditionIcon = document.createElement(`span`);
+        daysConditionIcon.className = `conditionIcon`;
+
+        daysLocationValue.innerHTML = daysFullFormat;
+        daysConditionIcon.innerHTML = `<img src="http://openweathermap.org/img/wn/${daysWeatherIcon}@2x.png" alt="Weather Condition" />`;
+
+        let tempField = document.createElement(`div`);
+        let windField = document.createElement(`div`);
+        let humidityField = document.createElement(`div`);
+
+        tempField.className = `temp`;
+        tempField.innerHTML = `Temp: <span class="tempValue">${daysTemperatureInF}</span> F`;
+
+        windField.className = `wind`;
+        windField.innerHTML = `Wind: <span class="windValue">${daysWindSpeed}</span> M/H`;
+
+        humidityField.className = `humidity`;
+        humidityField.innerHTML = `Humidity: <span class="humidityValue">${daysHumidity}</span> %`;
+
+        daysWeatherDetailsElement.append(tempField);
+        daysWeatherDetailsElement.append(windField);
+        daysWeatherDetailsElement.append(humidityField);
+
+        daysLocationElement.append(daysLocationValue);
+        daysLocationElement.append(daysConditionIcon);
+
+        dayForecastElement.append(daysLocationElement);
+        dayForecastElement.append(daysWeatherDetailsElement);
+        
         fivedayForcast.append(dayForecastElement);
     });
 
